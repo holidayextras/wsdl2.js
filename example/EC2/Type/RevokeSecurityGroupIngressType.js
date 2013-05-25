@@ -1,0 +1,32 @@
+var Modeler = require("../Modeler.js");
+var className = 'TypeRevokeSecurityGroupIngressType';
+
+var TypeRevokeSecurityGroupIngressType = function(json, parentObj) {
+  parentObj = parentObj || this;
+	
+	
+	// Class property definitions here:
+	Modeler.extend(className, {
+	  groupId: {
+      type: "string",
+      wsdlDefinition: {
+        name: "groupId",
+        type: "xs:string"
+      },
+      mask: Modeler.GET | Modeler.SET,
+      required: false
+    },
+    groupName: {
+      type: "string",
+      wsdlDefinition: {
+        name: "groupName",
+        type: "xs:string"
+      },
+      mask: Modeler.GET | Modeler.SET,
+      required: false
+    }
+	}, parentObj, json);
+};
+
+module.exports = TypeRevokeSecurityGroupIngressType;
+Modeler.register(TypeRevokeSecurityGroupIngressType, "TypeRevokeSecurityGroupIngressType");

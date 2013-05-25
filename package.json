@@ -1,0 +1,26 @@
+{
+  "author": "Oliver Rumbelow <oliver.rumbelow@holidayextras.com> (http://www.holidayextras.co.uk/)",
+  "name": "wsdl2.js",
+  "description": "Consumes a WSDL file and produces a high quality, manageable Javascript library",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/holidayextras/wsdl2.js.git"
+  },
+  "keywords": [
+    "soap",
+    "wsdl",
+    "generator",
+    "converter"
+  ],
+  "dependencies": {
+    "request": ">=2.16.6",
+    "xml2json": ">=0.3.2"
+  },
+  "engines": {
+    "node": "*"
+  },
+  "preferGlobal": "true",
+  "bin" : { "wsdl2.js" : "./wsdl2.js" },
+  "license": "GPL"
+}
