@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="wsdl2.js : A NodeJS tool to consume a WSDL file and output a neat, manageable Javascript library." />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>wsdl2.js</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/holidayextras/wsdl2.js">View on GitHub</a>
+
+          <h1 id="project_title">wsdl2.js</h1>
+          <h2 id="project_tagline">A NodeJS tool to consume a WSDL file and output a neat, manageable Javascript library.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/holidayextras/wsdl2.js/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/holidayextras/wsdl2.js/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h2>Introduction</h2>
+
+<p>This is a NodeJS tool to consume a WSDL file and output a neat, manageable Javascript library. It is not 100% complete, but it gives us full coverage of the services we need at Holiday Extras. If it doesn't do everything you need, fork us and contribute back to the community :)</p>
+
+<h2>Where do I find it?</h2>
+
+<p>Either get it from npm:</p>
+
+<pre><code>sudo npm install -g wsdl2.js
+</code></pre>
+
+<p>Or checkout the repo:</p>
+
+<pre><code>git clone https://github.com/holidayextras/wsdl2.js.git
+npm install
+</code></pre>
+
+<h2>How do I use it?</h2>
+
+<p>This will generate a folder called [serviceName] in the current directory ready to be require'd and used:</p>
+
+<pre><code>wsdl2.js [serviceName] [/local/path/to/wsdl]
+</code></pre>
+
+<h2>Requirements for using the generated code</h2>
+
+<p>Note: these modules are installed by npm-installing wsdl2.js</p>
+
+<pre><code>npm install request xml2json
+</code></pre>
+
+<h2>Generated code structure</h2>
+
+<pre><code>./[ServiceName]/
+|   // This holds one file per defined Element within the WSDL
+├── Element
+│   ├── SomeDefinedElement.js
+|   └── ...
+|   // This is the main file which handles requests, JSON-&gt;XML-&gt;JSON, etc
+├── index.js
+|   // This is where mock data goes from [myService].Settings.createMock
+├── Mocks
+│   ├── WsdlOperationName.js
+|   └── ...
+|   // This library provides strong typing, it's used in each Element/Type
+├── Modeler.js
+|   // This file defines the top level functionality found within the WSDL
+├── ServiceDefinition.js
+|   // This holds one file per defined Type within the WSDL
+└── Type
+    ├── SomeDefinedType.js
+    └── ...
+</code></pre>
+
+<h2>Using the generated code</h2>
+
+<p>Start by including the generated code:</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">Service</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"path/to/generated/code"</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">EC2</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"lib/EC2"</span><span class="p">);</span>
+</pre></div>
+
+<p>This is how we create a new request:</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">someRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Service</span><span class="p">.[</span><span class="nx">WSDL</span><span class="o">-</span><span class="nx">Binding</span><span class="o">-</span><span class="nx">Name</span><span class="p">].[</span><span class="nx">WSDL</span><span class="o">-</span><span class="nx">Operation</span><span class="o">-</span><span class="nx">Name</span><span class="p">]();</span>
+<span class="kd">var</span> <span class="nx">assignRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">EC2</span><span class="p">.</span><span class="nx">AmazonEC2Port</span><span class="p">.</span><span class="nx">AssignPrivateIpAddresses</span><span class="p">();</span>
+</pre></div>
+
+<p>Setting basic properties is trivial</p>
+
+<div class="highlight"><pre><span class="nx">someRequest</span><span class="p">.</span><span class="nx">someSimpleProperty</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</pre></div>
+
+<p>Most requests consist of several complex types, they are all found within our service object:</p>
+
+<div class="highlight"><pre><span class="nx">someRequest</span><span class="p">.</span><span class="nx">someElementProperty</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Service</span><span class="p">.</span><span class="nx">Elements</span><span class="p">.[</span><span class="nx">WSDL</span><span class="o">-</span><span class="nx">Element</span><span class="o">-</span><span class="nx">Name</span><span class="p">]();</span>
+<span class="nx">someRequest</span><span class="p">.</span><span class="nx">someTypeProperty</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Service</span><span class="p">.</span><span class="nx">Types</span><span class="p">.[</span><span class="nx">WSDL</span><span class="o">-</span><span class="nx">Type</span><span class="o">-</span><span class="nx">Name</span><span class="p">]();</span>
+</pre></div>
+
+<p>Populating Requests/Elements/Types can be done one at a time:</p>
+
+<div class="highlight"><pre><span class="nx">someRequest</span><span class="p">.</span><span class="nx">someNumber</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="nx">someRequest</span><span class="p">.</span><span class="nx">someString</span> <span class="o">=</span> <span class="s2">"1"</span><span class="p">;</span>
+</pre></div>
+
+<p>We can also populate directly from a JSON object:</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">json</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">someNumber</span><span class="o">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">someString</span><span class="o">:</span> <span class="s2">"1"</span> <span class="p">};</span>
+<span class="nx">someRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Service</span><span class="p">.</span><span class="nx">TestRequest</span><span class="p">(</span><span class="nx">json</span><span class="p">);</span>
+<span class="c1">// someRequest.someNumber == 1</span>
+<span class="c1">// someRequest.someString == "1"</span>
+</pre></div>
+
+<p>Trying to set a property's value to an invalid type will be discarded:</p>
+
+<div class="highlight"><pre><span class="nx">someRequest</span><span class="p">.</span><span class="nx">PersonElement</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+<span class="nx">someRequest</span><span class="p">.</span><span class="nx">PersonElement</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SomeRandomObject</span><span class="p">();</span>
+<span class="c1">// someRequest.PersonElement == null;</span>
+</pre></div>
+
+<p>If we have an array of objects there's a helper function to save typing:</p>
+
+<div class="highlight"><pre><span class="nx">someRequest</span><span class="p">.</span><span class="nx">PeopleList</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Service</span><span class="p">.</span><span class="nx">Types</span><span class="p">.</span><span class="nx">ArrayOfPeople</span><span class="p">;</span>
+<span class="nx">someRequest</span><span class="p">.</span><span class="nx">PeopleList</span><span class="p">.</span><span class="nx">newChild</span><span class="p">({</span> <span class="nx">firstname</span><span class="o">:</span> <span class="s2">"Oli"</span><span class="p">,</span> <span class="nx">age</span><span class="o">:</span> <span class="mi">24</span> <span class="p">});</span>
+<span class="c1">// is the equivalent of:</span>
+<span class="nx">someRequest</span><span class="p">.</span><span class="nx">PeopleList</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Service</span><span class="p">.</span><span class="nx">Types</span><span class="p">.</span><span class="nx">ArrayOfPeople</span><span class="p">;</span>
+<span class="kd">var</span> <span class="nx">newPerson</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Service</span><span class="p">.</span><span class="nx">Types</span><span class="p">.</span><span class="nx">Person</span><span class="p">();</span>
+<span class="nx">newPerson</span><span class="p">.</span><span class="nx">firstname</span> <span class="o">=</span> <span class="s2">"Oli"</span><span class="p">;</span>
+<span class="nx">newPerson</span><span class="p">.</span><span class="nx">age</span> <span class="o">=</span> <span class="mi">24</span><span class="p">;</span>
+<span class="nx">someRequest</span><span class="p">.</span><span class="nx">PeopleList</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">newPerson</span><span class="p">);</span>
+</pre></div>
+
+<p>Making the request is trivial:</p>
+
+<div class="highlight"><pre><span class="nx">someRequest</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+  <span class="c1">// 'response' is a modeled object, it WILL conform to the WSDL.</span>
+  <span class="c1">//... w00p!</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>Once we have a request and we want to edit it by adding properties not found in the WDSL, we must first extract the data from the response:</p>
+
+<div class="highlight"><pre><span class="nx">someRequest</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">response</span><span class="p">.</span><span class="nx">SomeInvalidProperty</span> <span class="o">=</span> <span class="s2">"testing"</span><span class="p">;</span>
+  <span class="c1">// response.SomeInvalidProperty == null</span>
+  <span class="kd">var</span> <span class="nx">myResponse</span> <span class="o">=</span> <span class="nx">response</span><span class="p">.</span><span class="nx">extract</span><span class="p">();</span>
+  <span class="nx">myResponse</span><span class="p">.</span><span class="nx">SomeInvalidProperty</span> <span class="o">=</span> <span class="s2">"testing"</span><span class="p">;</span>
+  <span class="c1">// myResponse.SomeInvalidProperty == "testing"</span>
+<span class="p">});</span>
+</pre></div>
+
+<h2>Runtime Settings and Debugging</h2>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">Service</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s2">"path/to/generated/code"</span><span class="p">);</span>
+
+<span class="c1">// This next statement will enable debugging for ALL soap requests</span>
+<span class="c1">// It prints to stdout JSON objects, XML documents, etc</span>
+<span class="c1">// default: false</span>
+<span class="nx">Service</span><span class="p">.</span><span class="nx">Settings</span><span class="p">.</span><span class="nx">debugSoap</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+
+<span class="c1">// This next statement will enable benchmarking for ALL soap requests</span>
+<span class="c1">// It prints to stdout the name of each request and its duration in ms</span>
+<span class="c1">// default: true</span>
+<span class="nx">Service</span><span class="p">.</span><span class="nx">Settings</span><span class="p">.</span><span class="nx">benchmark</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+
+<span class="c1">// This next statement will store the most recent request of each type to file</span>
+<span class="c1">// It outputs to [/path/to/generated/code]/Mocks/[request-name]</span>
+<span class="c1">// default: false</span>
+<span class="nx">Service</span><span class="p">.</span><span class="nx">Settings</span><span class="p">.</span><span class="nx">createMock</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+
+<span class="c1">// This next statement will use saved mock requests instead of real requests</span>
+<span class="c1">// default: false</span>
+<span class="nx">Service</span><span class="p">.</span><span class="nx">Settings</span><span class="p">.</span><span class="nx">useMock</span> <span class="o">=</span> <span class="kc">true</span><span class="p">;</span>
+
+<span class="c1">// We can debug single SOAP requests by using the .debug() function, which is</span>
+<span class="c1">// a property of every request and response object</span>
+<span class="kd">var</span> <span class="nx">additionRequest</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Service</span><span class="p">.</span><span class="nx">MathService</span><span class="p">.</span><span class="nx">AdditionFunction</span><span class="p">(</span><span class="nx">json</span><span class="p">);</span>
+<span class="nx">additionRequest</span><span class="p">.</span><span class="nx">debug</span><span class="p">();</span> <span class="c1">// Watch your console output</span>
+<span class="nx">additionRequest</span><span class="p">.</span><span class="nx">request</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+  <span class="nx">response</span><span class="p">.</span><span class="nx">debug</span><span class="p">();</span> <span class="c1">// Watch your console output</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">err</span> <span class="o">||</span> <span class="o">!</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">callback</span><span class="p">(</span><span class="nx">err</span> <span class="o">||</span> <span class="s2">"No response?"</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="c1">//... w00p!</span>
+<span class="p">});</span>
+</pre></div>
+
+<h2>Checking the generated service definition</h2>
+
+<p>Generic example of ./[ServiceName]/ServiceDefinition.js:</p>
+
+<div class="highlight"><pre><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s2">"[WSDL-Binding-Name]"</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">"namespace"</span><span class="o">:</span> <span class="s2">"http://blahblah.com/webservices/"</span><span class="p">,</span>
+    <span class="s2">"serviceUrl"</span><span class="o">:</span> <span class="s2">"https://www.blahblah.com/path/to/service.blah"</span><span class="p">,</span>
+    <span class="s2">"[WSDL-Operation-Name]"</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s2">"soapAction"</span><span class="o">:</span> <span class="s2">"blahblahblah"</span><span class="p">,</span>
+      <span class="s2">"input"</span><span class="o">:</span> <span class="s2">"[Top-Level-Request-Element-For-Operation]"</span><span class="p">,</span>
+      <span class="s2">"output"</span><span class="o">:</span> <span class="s2">"[Top-Level-Response-Element-For-Operation]"</span>
+    <span class="p">},</span>
+    <span class="p">...</span>
+  <span class="p">},</span>
+  <span class="p">...</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>Example of Amazon's EC2 service:</p>
+
+<div class="highlight"><pre><span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="s2">"AmazonEC2Port"</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">"namespace"</span><span class="o">:</span> <span class="s2">"http://ec2.amazonaws.com/doc/2013-02-01/"</span><span class="p">,</span>
+    <span class="s2">"serviceUrl"</span><span class="o">:</span> <span class="s2">"https://ec2.amazonaws.com/"</span><span class="p">,</span>
+    <span class="s2">"ActivateLicense"</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s2">"soapAction"</span><span class="o">:</span> <span class="s2">"ActivateLicense"</span><span class="p">,</span>
+      <span class="s2">"input"</span><span class="o">:</span> <span class="s2">"ElementActivateLicense"</span><span class="p">,</span>
+      <span class="s2">"output"</span><span class="o">:</span> <span class="s2">"ElementActivateLicenseResponse"</span>
+    <span class="p">},</span>
+    <span class="s2">"AssignPrivateIpAddresses"</span><span class="o">:</span> <span class="p">{</span>
+      <span class="s2">"soapAction"</span><span class="o">:</span> <span class="s2">"AssignPrivateIpAddresses"</span><span class="p">,</span>
+      <span class="s2">"input"</span><span class="o">:</span> <span class="s2">"ElementAssignPrivateIpAddresses"</span><span class="p">,</span>
+      <span class="s2">"output"</span><span class="o">:</span> <span class="s2">"ElementAssignPrivateIpAddressesResponse"</span>
+    <span class="p">},</span>
+    <span class="p">...</span>
+  <span class="p">},</span>
+  <span class="p">...</span>
+<span class="p">}</span>
+</pre></div>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">wsdl2.js maintained by <a href="https://github.com/holidayextras">holidayextras</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
