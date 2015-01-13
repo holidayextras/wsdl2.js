@@ -10,6 +10,7 @@ sudo npm install -g wsdl2.js
 Or checkout the repo:
 ```
 git clone https://github.com/holidayextras/wsdl2.js.git
+cd wsdl2.js
 npm install
 ```
 
@@ -18,6 +19,15 @@ This will generate a folder called [serviceName] in the current directory ready 
 ```
 wsdl2.js [serviceName] [/local/path/to/wsdl]
 ```
+
+## SOAP 1.1
+It's assumed by default you're working with a SOAP 1.2 service expecting an `application/soap+xml; charset=utf-8` content-type; you can pass in an option to get the `text/xml; charset=utf-8` that a SOAP 1.1 service will be expecting:
+
+```
+wsdl2.js [serviceName] [/local/path/to/wsdl] --soap-version 1.1
+```
+
+If the service responds with something like "The server cannot service the request because the media type is unsupported.", you are probably targeting the wrong SOAP version.
 
 ## Requirements for using the generated code
 Note: these modules are installed by npm-installing wsdl2.js

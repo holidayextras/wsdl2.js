@@ -105,7 +105,7 @@ function handleSoapResponse(method, outputModel, startTime, err, body, callback)
 function doSoapRequest(url, method, soapAction, data, inputModel, outputModel, ns, callback) {
   if (!data.validate()) return callback("Input model failed to validate!");
   var headers = {
-    'Content-Type': 'application/soap+xml; charset=utf-8',
+    'Content-Type': '###1###',
     'SOAPAction': '"'+soapAction+'"'
   };
   

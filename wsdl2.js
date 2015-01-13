@@ -20,6 +20,7 @@ along with wsdl2.js.  If not, see <http://www.gnu.org/licenses/>.
 var Modeler = require("./Modeler.js");
 var parser = require('xml2json');
 var fs = require('fs');
+var minimist = require('minimist');
 
 var typeMap = { };
 var ns = { };
@@ -32,22 +33,47 @@ var xmlCache = {
   complexTypes: { },
   simpleTypes: { }
 };
+var contentTypeHeaders = {
+  '1.1': 'text/xml; charset=utf-8',
+  '1.2': 'application/soap+xml; charset=utf-8'
+};
+
+var argv = minimist(process.argv.slice(2));
+var serviceName = argv._[0];
+var pathToWsdl = argv._[1];
+var soapVersion = (argv['soap-version'] || '1.2').toString();
+
+if(Object.keys(contentTypeHeaders).indexOf(soapVersion) === -1) {
+  process.stdout.write('invalid --soap-version option, expected one of ' + Object.keys(contentTypeHeaders).join(', ') + '\n');
+  process.exit(1);
+}
+
+if(!(serviceName && pathToWsdl)) {
+  process.stdout.write('usage: wsdl2.js [serviceName] [/local/path/to/wsdl]\n');
+  process.exit(1);
+}
+
+try {
+  var xmlWsdlDefinition = fs.readFileSync(pathToWsdl);
+} catch(e) {
+  process.stdout.write(pathToWsdl + ' could not be opened\n');
+  process.exit(1);
+}
 
 try { 
-  fs.mkdirSync(process.cwd()+"/"+process.argv[2]);
+  fs.mkdirSync(process.cwd()+"/"+serviceName);
 } catch(e) { }
 try { 
-  fs.mkdirSync(process.cwd()+"/"+process.argv[2]+"/Type");
+  fs.mkdirSync(process.cwd()+"/"+serviceName+"/Type");
 } catch(e) { }
 try { 
-  fs.mkdirSync(process.cwd()+"/"+process.argv[2]+"/Element");
+  fs.mkdirSync(process.cwd()+"/"+serviceName+"/Element");
 } catch(e) { }
 try { 
-  fs.mkdirSync(process.cwd()+"/"+process.argv[2]+"/Mocks");
+  fs.mkdirSync(process.cwd()+"/"+serviceName+"/Mocks");
 } catch(e) { }
 
 var classTemplate = fs.readFileSync(__dirname+'/classTemplate.js');
-var xmlWsdlDefinition = fs.readFileSync(process.argv[3]);
 var json = JSON.parse(parser.toJson(xmlWsdlDefinition));
 processWSDL(json);
 
@@ -67,13 +93,14 @@ function processWSDL(json) {
   processTypes(json);
   
   var serviceDefinition = "module.exports = "+JSON.stringify(services,null,2);
-  fs.writeFile(process.cwd()+"/"+process.argv[2]+'/ServiceDefinition.js', serviceDefinition);
+  fs.writeFile(process.cwd()+"/"+serviceName+'/ServiceDefinition.js', serviceDefinition);
   
   var modelerFile = fs.readFileSync(__dirname+"/Modeler.js");
-  fs.writeFile(process.cwd()+"/"+process.argv[2]+'/Modeler.js', modelerFile);
+  fs.writeFile(process.cwd()+"/"+serviceName+'/Modeler.js', modelerFile);
   
-  var indexFile = fs.readFileSync(__dirname+"/serviceProvider.js");
-  fs.writeFile(process.cwd()+"/"+process.argv[2]+'/index.js', indexFile);
+  var indexFile = fs.readFileSync(__dirname+"/serviceProvider.js", 'utf8');
+  indexFile = indexFile.replace("###1###", contentTypeHeaders[soapVersion]);
+  fs.writeFile(process.cwd()+"/"+serviceName+'/index.js', indexFile);
 };
 
 /*****************************************
@@ -416,9 +443,9 @@ function createClass(className, type, propertyDefinition) {
   newClass = newClass.replace(/###3###/g, "");
   // Write the Class definition to file
   try {
-    fs.unlinkSync(process.argv[2]+'/'+className+".js", 10000);
+    fs.unlinkSync(serviceName+'/'+className+".js", 10000);
   } catch(e) { }
-  fs.writeFile(process.cwd()+'/'+process.argv[2]+'/'+type+"/"+className+".js", newClass, function (err) { });
+  fs.writeFile(process.cwd()+'/'+serviceName+'/'+type+"/"+className+".js", newClass, function (err) { });
 };
 
 
