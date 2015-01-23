@@ -28,7 +28,7 @@ var services = { };
 var bindings = { };
 var messages = { };
 var portTypes = { };
-var xmlCache = { 
+var xmlCache = {
   elements: { },
   complexTypes: { },
   simpleTypes: { }
@@ -42,6 +42,7 @@ var argv = minimist(process.argv.slice(2));
 var serviceName = argv._[0];
 var pathToWsdl = argv._[1];
 var soapVersion = (argv['soap-version'] || '1.2').toString();
+var keepEmptyTags = argv['keep-empty-tags'] ? true : false;
 
 if(Object.keys(contentTypeHeaders).indexOf(soapVersion) === -1) {
   process.stdout.write('invalid --soap-version option, expected one of ' + Object.keys(contentTypeHeaders).join(', ') + '\n');
@@ -60,16 +61,16 @@ try {
   process.exit(1);
 }
 
-try { 
+try {
   fs.mkdirSync(process.cwd()+"/"+serviceName);
 } catch(e) { }
-try { 
+try {
   fs.mkdirSync(process.cwd()+"/"+serviceName+"/Type");
 } catch(e) { }
-try { 
+try {
   fs.mkdirSync(process.cwd()+"/"+serviceName+"/Element");
 } catch(e) { }
-try { 
+try {
   fs.mkdirSync(process.cwd()+"/"+serviceName+"/Mocks");
 } catch(e) { }
 
@@ -91,15 +92,16 @@ function processWSDL(json) {
   processPortTypes(json);
   processBindings(json);
   processTypes(json);
-  
+
   var serviceDefinition = "module.exports = "+JSON.stringify(services,null,2);
   fs.writeFile(process.cwd()+"/"+serviceName+'/ServiceDefinition.js', serviceDefinition);
-  
+
   var modelerFile = fs.readFileSync(__dirname+"/Modeler.js");
   fs.writeFile(process.cwd()+"/"+serviceName+'/Modeler.js', modelerFile);
-  
+
   var indexFile = fs.readFileSync(__dirname+"/serviceProvider.js", 'utf8');
   indexFile = indexFile.replace("###1###", contentTypeHeaders[soapVersion]);
+  indexFile = indexFile.replace('###2###', keepEmptyTags);
   fs.writeFile(process.cwd()+"/"+serviceName+'/index.js', indexFile);
 };
 
@@ -114,15 +116,15 @@ function findNamespaces(json) {
     'http://www.w3.org/2001/XMLSchema': 'xsd'
   };
   var wsdlDefinitions = json[Object.keys(json)[0]];
-  
+
   for (var someAttr in wsdlDefinitions) {
     if (mapping.hasOwnProperty(wsdlDefinitions[someAttr])) {
       ns[mapping[wsdlDefinitions[someAttr]]] = (someAttr.split(":").concat([""]))[1]+":";
     }
   };
-  
+
   if (!ns.hasOwnProperty('wsdl') || (ns['wsdl']==":")) ns['wsdl'] = "";
-  
+
   typeMap[ns['xsd']+"string"] = "string";
   typeMap[ns['xsd']+"int"] = "number";
   typeMap[ns['xsd']+"boolean"] = "boolean";
@@ -251,12 +253,12 @@ function processBindings(json) {
               soapAction: someOperation[ns['soap']+'operation'].soapAction,
               input: messages[portType.input][0],
               output: messages[portType.output][0]
-            }; 
+            };
             // Link the operation back to the service
             thisService[someOperation.name] = bindings[someOperation.name];
           }
         });
-      } 
+      }
     };
   });
   // Remove the placeholders now we've linked bindings to services
@@ -265,8 +267,8 @@ function processBindings(json) {
   }
   //console.log("Bindings:", bindings);
   //console.log("");
-};  
-  
+};
+
 
 /******************************************
 <wsdl:types>
@@ -302,7 +304,7 @@ function processTypes(json) {
         xmlCache.elements[someElement.name] = someElement;
       });
     }
-    
+
     var complexTypes = thisSchema[ns['xsd']+'complexType'];
     if (complexTypes != null) {
       if (!(complexTypes instanceof Array)) complexTypes = [complexTypes];
@@ -310,7 +312,7 @@ function processTypes(json) {
         xmlCache.complexTypes[someComplexType.name] = someComplexType;
       });
     }
-    
+
     var simpleTypes = thisSchema[ns['xsd']+'simpleType'];
     if (simpleTypes != null) {
       if (!(simpleTypes instanceof Array)) simpleTypes = [simpleTypes];
@@ -383,7 +385,7 @@ function propertyModelElement(json) {
       } else {
         newType = "Type"+stripNamespace(wsdlProperty.type);
       }
-      
+
       //
       // Build the PropertyModeler property definition
       //
@@ -392,9 +394,9 @@ function propertyModelElement(json) {
         wsdlDefinition: wsdlProperty,
         mask: Modeler.GET | Modeler.SET,
         required: (parseInt(wsdlProperty.minOccurs)>0)
-      }; 
+      };
       //propertyDefinition[wsdlProperty.name].wsdlDefinition.type = newType;
-      
+
       if ((parseInt(wsdlProperty.maxOccurs)>1 || (wsdlProperty.maxOccurs=="unbounded")) &&
           (!newType.match(/ArrayOf/)) ) {
         propertyDefinition[wsdlProperty.name].mask |= Modeler.ARRAY;
@@ -408,7 +410,7 @@ function propertyModelElement(json) {
     console.error("Uhhh... Whats this?!", JSON.stringify(json, null, 2));
     propertyDefinition.dummy = { };
   };
-  
+
   return propertyDefinition;
 };
 

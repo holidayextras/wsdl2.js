@@ -29,6 +29,13 @@ wsdl2.js [serviceName] [/local/path/to/wsdl] --soap-version 1.1
 
 If the service responds with something like "The server cannot service the request because the media type is unsupported.", you are probably targeting the wrong SOAP version.
 
+## Send empty tags
+By default any empty tags will be stripped out of the request as they are probably not needed. Some services may require you to send these even if they are empty. You can change this behaviour by passing in the following option:
+
+```
+wsdl2.js [serviceName] [/local/path/to/wsdl] --keep-empty-tags
+```
+
 ## Requirements for using the generated code
 Note: these modules are installed by npm-installing wsdl2.js
 ```
