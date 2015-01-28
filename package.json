@@ -7,6 +7,9 @@
     "type": "git",
     "url": "https://github.com/holidayextras/wsdl2.js.git"
   },
+  "scripts": {
+    "test": "node tests/test && echo ✔"
+  },
   "keywords": [
     "soap",
     "wsdl",
