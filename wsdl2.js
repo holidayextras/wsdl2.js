@@ -17,7 +17,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with wsdl2.js.  If not, see <http://www.gnu.org/licenses/>.
 *******************************************************************/
-var Modeler = require("./Modeler.js");
+var Modeler = require("./lib/Modeler.js");
 var parser = require('xml2json');
 var fs = require('fs');
 var minimist = require('minimist');
@@ -74,7 +74,7 @@ try {
   fs.mkdirSync(process.cwd()+"/"+serviceName+"/Mocks");
 } catch(e) { }
 
-var classTemplate = fs.readFileSync(__dirname+'/classTemplate.js');
+var classTemplate = fs.readFileSync(__dirname+'/lib/classTemplate.js');
 var json = JSON.parse(parser.toJson(xmlWsdlDefinition));
 processWSDL(json);
 
@@ -96,10 +96,10 @@ function processWSDL(json) {
   var serviceDefinition = "module.exports = "+JSON.stringify(services,null,2);
   fs.writeFile(process.cwd()+"/"+serviceName+'/ServiceDefinition.js', serviceDefinition);
 
-  var modelerFile = fs.readFileSync(__dirname+"/Modeler.js");
+  var modelerFile = fs.readFileSync(__dirname+"/lib/Modeler.js");
   fs.writeFile(process.cwd()+"/"+serviceName+'/Modeler.js', modelerFile);
 
-  var indexFile = fs.readFileSync(__dirname+"/serviceProvider.js", 'utf8');
+  var indexFile = fs.readFileSync(__dirname+"/lib/serviceProvider.js", 'utf8');
   indexFile = indexFile.replace("###1###", contentTypeHeaders[soapVersion]);
   indexFile = indexFile.replace('###2###', keepEmptyTags);
   fs.writeFile(process.cwd()+"/"+serviceName+'/index.js', indexFile);

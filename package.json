@@ -25,5 +25,8 @@
   "bin": {
     "wsdl2.js": "./wsdl2.js"
   },
-  "license": "GPL"
+  "license": "GPL",
+  "devDependencies": {
+    "rimraf": "^2.2.8"
+  }
 }
