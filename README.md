@@ -208,3 +208,7 @@ module.exports = {
 }
 ```
 
+## Tests
+Run tests using `npm test`*
+
+*: You may need to run `ulimit -n 1000` to up the number of open files you can have open at any one time.
