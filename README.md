@@ -10,6 +10,7 @@ sudo npm install -g wsdl2.js
 Or checkout the repo:
 ```
 git clone https://github.com/holidayextras/wsdl2.js.git
+cd wsdl2.js
 npm install
 ```
 
@@ -17,6 +18,22 @@ npm install
 This will generate a folder called [serviceName] in the current directory ready to be require'd and used:
 ```
 wsdl2.js [serviceName] [/local/path/to/wsdl]
+```
+
+## SOAP 1.1
+It's assumed by default you're working with a SOAP 1.2 service expecting an `application/soap+xml; charset=utf-8` content-type; you can pass in an option to get the `text/xml; charset=utf-8` that a SOAP 1.1 service will be expecting:
+
+```
+wsdl2.js [serviceName] [/local/path/to/wsdl] --soap-version 1.1
+```
+
+If the service responds with something like "The server cannot service the request because the media type is unsupported.", you are probably targeting the wrong SOAP version.
+
+## Send empty tags
+By default any empty tags will be stripped out of the request as they are probably not needed. Some services may require you to send these even if they are empty. You can change this behaviour by passing in the following option:
+
+```
+wsdl2.js [serviceName] [/local/path/to/wsdl] --keep-empty-tags
 ```
 
 ## Requirements for using the generated code
@@ -191,3 +208,7 @@ module.exports = {
 }
 ```
 
+## Tests
+Run tests using `npm test`*
+
+*: You may need to run `ulimit -n 1000` to up the number of open files you can have open at any one time.
