@@ -30,6 +30,7 @@
   },
   "license": "GPL",
   "devDependencies": {
-    "rimraf": "^2.2.8"
+    "rimraf": "^2.2.8",
+    "sinon": "^1.12.2"
   }
 }
