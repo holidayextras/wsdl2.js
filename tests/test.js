@@ -18,6 +18,7 @@ var serviceStructurePaths = {
   definition: '/ServiceDefinition.js'
 };
 var wsdlFile = __dirname + '/ec2.wsdl';
+var sandbox = sinon.sandbox.create();
 
 var tests = {
   'Check service generated properly': function() {
@@ -35,7 +36,7 @@ var tests = {
     });
   },
   'Check library sends the correct response body': function() {
-    sinon.stub(request, 'post');
+    sandbox.stub(request, 'post');
 
     var params = {
       ActivateLicense: new Service.Types.ActivateLicenseType({ licenseId: 'foo', capacity: 1 })
@@ -45,6 +46,47 @@ var tests = {
 
     params = request.post.getCall(0).args[0];
     assert.ok(~params.body.indexOf('<ActivateLicense><licenseId>foo</licenseId><capacity>1</capacity></ActivateLicense></ActivateLicense>'));
+  },
+  'Check library sends configurable timeout': function() {
+    sandbox.stub(request, 'post');
+
+    var params = {
+      ActivateLicense: new Service.Types.ActivateLicenseType({ licenseId: 'foo', capacity: 1 })
+    }
+    var activateLicense = new Service.AmazonEC2Port.ActivateLicense(params)
+    Service.Settings.timeout = 35000;
+    activateLicense.request(function() { });
+
+    params = request.post.getCall(0).args[0];
+    assert.equal(params.timeout, 35000);
+  },
+  'Check library with debugging logs to standard out': function() {
+    sandbox.stub(request, 'post');
+    sandbox.stub(process.stdout, 'write');
+
+    var params = {
+      ActivateLicense: new Service.Types.ActivateLicenseType({ licenseId: 'foo', capacity: 1 })
+    }
+    var activateLicense = new Service.AmazonEC2Port.ActivateLicense(params)
+    var logStub = sinon.stub();
+    Service.Settings.debugSoap = true;
+    activateLicense.request(function() { });
+
+    assert.ok(process.stdout.write.called);
+  },
+  'Check library with debugging logs to custom stream': function() {
+    sandbox.stub(request, 'post');
+
+    var params = {
+      ActivateLicense: new Service.Types.ActivateLicenseType({ licenseId: 'foo', capacity: 1 })
+    }
+    var activateLicense = new Service.AmazonEC2Port.ActivateLicense(params)
+    var logStub = sinon.stub();
+    Service.Settings.debugSoap = true;
+    Service.Settings.logger = logStub;
+    activateLicense.request(function() { });
+
+    assert.ok(logStub.called);
   }
 };
 
@@ -54,6 +96,7 @@ generation.on('close', function(code) {
   for (var test in tests) {
     console.log('RUNNING:', test);
     tests[test]();
+    sandbox.restore();
   }
   if (fs.existsSync(servicePath)) rimraf.sync(servicePath);
   assert.equal(code, 0, 'WSDL exited with a code other than 0');
