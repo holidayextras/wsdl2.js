@@ -136,10 +136,19 @@ someRequest.request(function(err, response) {
 ```javascript
 var Service = require("path/to/generated/code");
 
+// This next statement will change the duration (in milliseconds)
+// the library will wait for the service to respond before timing
+// out. The default is 15000 (15 seconds)
+Service.Settings.timeout = 5000;
+
 // This next statement will enable debugging for ALL soap requests
 // It prints to stdout JSON objects, XML documents, etc
 // default: false
 Service.Settings.debugSoap = true;
+
+// This next statement will change where the library's debugging
+// output gets written to. (The default is STDOUT)
+Service.Settings.logger = fs.createWriteStream('./test').write;
 
 // This next statement will enable benchmarking for ALL soap requests
 // It prints to stdout the name of each request and its duration in ms
