@@ -2,7 +2,7 @@
   "author": "Oliver Rumbelow <oliver.rumbelow@holidayextras.com> (http://www.holidayextras.co.uk/)",
   "name": "wsdl2.js",
   "description": "Consumes a WSDL file and produces a high quality, manageable Javascript library",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/holidayextras/wsdl2.js.git"

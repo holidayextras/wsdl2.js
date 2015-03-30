@@ -61,7 +61,7 @@ var tests = {
     assert.equal(params.timeout, 35000);
   },
   'Check library with debugging logs to standard out': function() {
-    sandbox.stub(request, 'post');
+    sandbox.stub(request, 'post').yields(null, { }, { });
     sandbox.stub(process.stdout, 'write');
 
     var params = {
@@ -75,7 +75,7 @@ var tests = {
     assert.ok(process.stdout.write.called);
   },
   'Check library with debugging logs to custom stream': function() {
-    sandbox.stub(request, 'post');
+    sandbox.stub(request, 'post').callsArgWith(1, null, { }, { });
 
     var params = {
       ActivateLicense: new Service.Types.ActivateLicenseType({ licenseId: 'foo', capacity: 1 })
