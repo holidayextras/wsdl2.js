@@ -75,7 +75,7 @@ var tests = {
     assert.ok(process.stdout.write.called);
   },
   'Check library with debugging logs to custom stream': function() {
-    sandbox.stub(request, 'post').callsArgWith(1, null, { }, { });
+    sandbox.stub(request, 'post').yields(null, { }, { });
 
     var params = {
       ActivateLicense: new Service.Types.ActivateLicenseType({ licenseId: 'foo', capacity: 1 })
