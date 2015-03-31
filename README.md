@@ -142,13 +142,18 @@ var Service = require("path/to/generated/code");
 Service.Settings.timeout = 5000;
 
 // This next statement will enable debugging for ALL soap requests
-// It prints to stdout JSON objects, XML documents, etc
+// It'll print out the request start and end times, how long the
+// request took, xml that was sent and recieved as well as the
+// json recieved and the output provided by the library
 // default: false
 Service.Settings.debugSoap = true;
 
-// This next statement will change where the library's debugging
-// output gets written to. (The default is STDOUT)
-Service.Settings.logger = fs.createWriteStream('./test').write;
+// This next statement allows you to override the default (stdout) logging
+// provided by wsdl2.js. The function will recieve a json object.
+// default: stdout
+Service.Settings.logger = function(data) {
+  fs.createWriteStream('./test').write(JSON.stringify(data));
+};
 
 // This next statement will enable benchmarking for ALL soap requests
 // It prints to stdout the name of each request and its duration in ms
@@ -173,7 +178,7 @@ additionRequest.request(function(err, response) {
   if (err || !response) {
     return callback(err || "No response?");
   }
-  
+
   //... w00p!
 });
 ```
